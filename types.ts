@@ -41,9 +41,12 @@ export interface ChatLifelineResult {
 export type LifelineResult = AudiencePollResult | ChatLifelineResult | null;
 
 export interface LeaderboardEntry {
+  id?: number;
+  created_at?: string;
   name: string;
   score: number; // Final prize
   points: number;
-  time: number; // in seconds
+  time_seconds: number;
   avatar: string;
+  game_mode: GameMode;
 }

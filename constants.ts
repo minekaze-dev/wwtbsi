@@ -31,13 +31,11 @@ export const GAME_MODES = {
         questionCount: 25,
         prizeTiers: NORMAL_PRIZE_TIERS,
         guaranteedLevels: [5, 10, 15, 20, 25],
-        leaderboardKey: 'quizmasterLeaderboard_normal'
     },
     HARD: {
         questionCount: 50,
         prizeTiers: HARD_PRIZE_TIERS,
         guaranteedLevels: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50],
-        leaderboardKey: 'quizmasterLeaderboard_hard'
     }
 };
 

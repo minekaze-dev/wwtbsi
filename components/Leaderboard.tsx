@@ -43,7 +43,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, title }) => {
                   <div className="text-xs text-indigo-300 flex flex-wrap items-center gap-x-3 gap-y-1">
                     <span className="whitespace-nowrap">🏆 {player.score.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}</span>
                     <span className="whitespace-nowrap">⭐ {player.points.toLocaleString('id-ID')} Pts</span>
-                    <span className="whitespace-nowrap">⏱️ {formatTime(player.time)}</span>
+                    <span className="whitespace-nowrap">⏱️ {formatTime(player.time_seconds)}</span>
                   </div>
                 </div>
                 <div className="font-bold text-base text-yellow-400 ml-auto pl-2">#{index + 1}</div>

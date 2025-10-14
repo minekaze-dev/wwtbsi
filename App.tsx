@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
 import { Question, GameState, Lifelines, LifelineResult, LeaderboardEntry, ChatMessage, GameMode } from './types';
 import { generateQuestions, getChatLifelineHelp } from './services/geminiService';
+import { fetchLeaderboard, addLeaderboardEntry } from './services/supabaseService';
 import { GAME_MODES, AVATARS } from './constants';
 import QuestionPanel from './components/QuestionPanel';
 import Sidebar from './components/Sidebar';
@@ -12,14 +13,6 @@ import ConfirmationModal from './components/ConfirmationModal';
 import EtiquetteModal from './components/EtiquetteModal';
 import ModeSelectionModal from './components/ModeSelectionModal';
 import TimerProgressBar from './components/TimerProgressBar';
-
-const getWeekIdentifier = (date: Date): string => {
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  const weekNo = Math.ceil((((d.valueOf() - yearStart.valueOf()) / 86400000) + 1) / 7);
-  return `${d.getUTCFullYear()}-${weekNo}`;
-};
 
 
 export default function App() {
@@ -49,7 +42,6 @@ export default function App() {
     // Timer State
     const [timeLeft, setTimeLeft] = useState<number | null>(null);
     const [totalDuration, setTotalDuration] = useState<number | null>(null);
-    // FIX: Declare lifelineTimer state variable
     const [lifelineTimer, setLifelineTimer] = useState<number | null>(null);
     const timerIntervalRef = useRef<number | null>(null);
     const lifelineIntervalRef = useRef<number | null>(null);
@@ -65,33 +57,24 @@ export default function App() {
         }
     }, []);
 
-    const loadLeaderboard = useCallback(() => {
-        const currentWeekId = getWeekIdentifier(new Date());
-
-        Object.keys(GAME_MODES).forEach(mode => {
-            const key = GAME_MODES[mode as GameMode].leaderboardKey;
-            const savedData = localStorage.getItem(key);
-            const setter = mode === 'NORMAL' ? setNormalLeaderboard : setHardLeaderboard;
-
-            if (savedData) {
-                try {
-                    const parsedData = JSON.parse(savedData);
-                    if (parsedData.weekId === currentWeekId && Array.isArray(parsedData.scores)) {
-                        setter(parsedData.scores);
-                    } else {
-                        setter([]);
-                    }
-                } catch (error) {
-                    console.error(`Failed to parse ${mode} leaderboard data, resetting.`, error);
-                    setter([]);
-                }
-            }
-        });
+    const loadLeaderboards = useCallback(async () => {
+        try {
+            const [normalScores, hardScores] = await Promise.all([
+                fetchLeaderboard('NORMAL'),
+                fetchLeaderboard('HARD')
+            ]);
+            setNormalLeaderboard(normalScores);
+            setHardLeaderboard(hardScores);
+        } catch (error) {
+            console.error("Failed to load leaderboards:", error);
+            // Optionally show an error toast to the user
+        }
     }, []);
 
+
     useEffect(() => {
-        loadLeaderboard();
-    }, [loadLeaderboard]);
+        loadLeaderboards();
+    }, [loadLeaderboards]);
     
     useEffect(() => {
         const handleVisibilityChange = () => {
@@ -107,16 +90,6 @@ export default function App() {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
         };
     }, [gameState]);
-
-
-    const saveLeaderboard = (mode: GameMode, board: LeaderboardEntry[]) => {
-        const currentWeekId = getWeekIdentifier(new Date());
-        const dataToSave = {
-            weekId: currentWeekId,
-            scores: board
-        };
-        localStorage.setItem(GAME_MODES[mode].leaderboardKey, JSON.stringify(dataToSave));
-    };
 
     const clearLifelineTimer = () => {
         clearTimer(lifelineIntervalRef);
@@ -360,25 +333,20 @@ export default function App() {
         const endTime = Date.now();
         const durationInSeconds = (endTime - startTimeRef.current) / 1000;
 
-        const newEntry: LeaderboardEntry = {
+        const newEntry: Omit<LeaderboardEntry, 'id' | 'created_at'> = {
             name,
             score: getFinalWinnings(),
             points: points,
-            time: durationInSeconds,
+            time_seconds: durationInSeconds,
             avatar: AVATARS[Math.floor(Math.random() * AVATARS.length)],
+            game_mode: gameMode,
         };
         
-        const currentLeaderboard = gameMode === 'NORMAL' ? normalLeaderboard : hardLeaderboard;
-        const newLeaderboard = [...currentLeaderboard, newEntry]
-            .sort((a, b) => a.time - b.time) // Sort by fastest time
-            .slice(0, 5);
-
-        if(gameMode === 'NORMAL') {
-            setNormalLeaderboard(newLeaderboard);
-            saveLeaderboard('NORMAL', newLeaderboard);
-        } else {
-            setHardLeaderboard(newLeaderboard);
-            saveLeaderboard('HARD', newLeaderboard);
+        try {
+            await addLeaderboardEntry(newEntry);
+            await loadLeaderboards(); 
+        } catch (error) {
+            console.error("Failed to submit score:", error);
         }
         
         handlePlayAgain();
@@ -431,7 +399,7 @@ export default function App() {
                                         transition={{ duration: 0.5 }}
                                         className="flex flex-col items-center"
                                     >
-                                        <h2 className="text-3xl md:text-4xl font-extrabold text-white">Selamat Datang di Who Wants to Be a Smart Indonesian!</h2>
+                                        <h2 className="text-3xl md:text-4xl font-extrabold text-white">Selamat Datang di Who Wants to Be a Smartest Indonesian!</h2>
                                         <p className="mt-4 text-gray-300 max-w-md mx-auto">
                                             Pilih mode permainan Anda dan buktikan pengetahuan Anda untuk menjadi yang terpintar di Indonesia!
                                         </p>
@@ -503,7 +471,7 @@ export default function App() {
                             <i className="fa-solid fa-brain"></i>
                         </div>
                         <div>
-                            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">Who Wants to Be a Smart Indonesian</h1>
+                            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">Who Wants to Be a Smartest Indonesian</h1>
                             <p className="text-xs sm:text-sm text-gray-300 font-semibold bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent">Be #1 in Indonesia</p>
                         </div>
                     </div>
@@ -523,7 +491,7 @@ export default function App() {
                 </AnimatePresence>
 
                 <footer className="text-center text-xs text-gray-500 pt-4 flex-shrink-0">
-                    © 2025 Who Wants to Be a Smart Indonesian. All Rights Reserved.
+                    © 2025 Who Wants to Be a Smartest Indonesian. All Rights Reserved.
                 </footer>
             </div>
             
