@@ -49,6 +49,7 @@ export default function App() {
     const timerIntervalRef = useRef<number | null>(null);
     const lifelineIntervalRef = useRef<number | null>(null);
     const startTimeRef = useRef<number | null>(null);
+    const gameEndTimeRef = useRef<number | null>(null);
     const [chatInput, setChatInput] = useState('');
     
     const gameConfig = useMemo(() => GAME_MODES[gameMode], [gameMode]);
@@ -70,7 +71,6 @@ export default function App() {
             setHardLeaderboard(hardScores);
         } catch (error) {
             console.error("Failed to load leaderboards:", error);
-            // Optionally show an error toast to the user
         }
     }, []);
 
@@ -79,11 +79,18 @@ export default function App() {
         loadLeaderboards();
     }, [loadLeaderboards]);
     
+    const endGame = useCallback(() => {
+        clearTimer(timerIntervalRef);
+        clearTimer(lifelineIntervalRef);
+        gameEndTimeRef.current = Date.now();
+        setGameState('GAME_OVER');
+    }, [clearTimer]);
+
     useEffect(() => {
         const handleVisibilityChange = () => {
             if (document.hidden && gameState === 'PLAYING') {
                 setDisqualified(true);
-                setGameState('GAME_OVER');
+                endGame();
             }
         };
 
@@ -92,7 +99,7 @@ export default function App() {
         return () => {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
         };
-    }, [gameState]);
+    }, [gameState, endGame]);
 
     const clearLifelineTimer = () => {
         clearTimer(lifelineIntervalRef);
@@ -115,7 +122,6 @@ export default function App() {
     };
     
     useEffect(() => {
-      // Main question timer logic
       if (gameState === 'PLAYING' && questions.length > 0 && currentIdx < questions.length) {
         const currentQ = questions[currentIdx];
         const duration = currentQ.category === 'Matematika' ? 90 : 30;
@@ -130,7 +136,7 @@ export default function App() {
             }
             clearTimer(timerIntervalRef);
             setTimedOut(true);
-            setGameState('GAME_OVER');
+            endGame();
             return 0;
           });
         }, 1000);
@@ -139,7 +145,7 @@ export default function App() {
       }
     
       return () => clearTimer(timerIntervalRef);
-    }, [gameState, currentIdx, questions, clearTimer]);
+    }, [gameState, currentIdx, questions, clearTimer, endGame]);
 
 
     useEffect(() => {
@@ -165,6 +171,7 @@ export default function App() {
         clearTimer(timerIntervalRef);
         setChatInput('');
         startTimeRef.current = null;
+        gameEndTimeRef.current = null;
         if(fullReset) {
             setLifelines({ fifty: false, audience: false, chat: false });
         }
@@ -217,7 +224,7 @@ export default function App() {
                     setPoints(prev => prev + 10);
                     if (currentIdx + 1 >= questions.length) {
                         setIsWinner(true);
-                        setGameState('GAME_OVER');
+                        endGame();
                     } else {
                         setCurrentIdx(prev => prev + 1);
                         setSelectedAnswer(null);
@@ -226,7 +233,7 @@ export default function App() {
                         setLifelineResult(null);
                     }
                 } else {
-                    setGameState('GAME_OVER');
+                    endGame();
                 }
             }, 2000);
         }, 1500);
@@ -237,9 +244,8 @@ export default function App() {
     };
 
     const handleConfirmWalkAway = () => {
-        clearTimer(timerIntervalRef);
         setWalkedAway(true);
-        setGameState('GAME_OVER');
+        endGame();
         setIsConfirmingWalkAway(false);
     };
 
@@ -327,19 +333,11 @@ export default function App() {
             return prev;
         });
     };
-    
-    const handlePlayAgain = useCallback(() => {
-        setGameState('WELCOME');
-        setQuestions([]);
-        resetGame(true);
-    }, []);
-
 
     const handleNameSubmit = async (name: string) => {
-        if (!isWinner || !startTimeRef.current) return;
+        if (!startTimeRef.current || !gameEndTimeRef.current) return;
 
-        const endTime = Date.now();
-        const durationInSeconds = (endTime - startTimeRef.current) / 1000;
+        const durationInSeconds = (gameEndTimeRef.current - startTimeRef.current) / 1000;
 
         const newEntry: Omit<LeaderboardEntry, 'id' | 'created_at'> = {
             name,
@@ -357,7 +355,9 @@ export default function App() {
             console.error("Failed to submit score:", error);
         }
         
-        handlePlayAgain();
+        setGameState('WELCOME');
+        setQuestions([]);
+        resetGame(true);
     };
 
     const getFinalWinnings = useCallback(() => {
@@ -517,7 +517,6 @@ export default function App() {
                         disqualified={disqualified}
                         timedOut={timedOut}
                         onSubmitName={handleNameSubmit}
-                        onPlayAgain={handlePlayAgain}
                     />
                 )}
             </AnimatePresence>

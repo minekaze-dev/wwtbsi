@@ -8,6 +8,7 @@ export const fetchLeaderboard = async (mode: GameMode): Promise<LeaderboardEntry
         .from('leaderboard')
         .select('*')
         .eq('game_mode', mode)
+        .order('score', { ascending: false })
         .order('time_seconds', { ascending: true })
         .limit(5);
 
@@ -16,11 +17,7 @@ export const fetchLeaderboard = async (mode: GameMode): Promise<LeaderboardEntry
         throw error;
     }
 
-    // Supabase client might return a different structure, so we ensure the fields match our LeaderboardEntry type
-    return (data || []).map(item => ({
-        ...item,
-        time: item.time_seconds // Ensure the field name matches what the component expects
-    })) as LeaderboardEntry[];
+    return (data || []) as LeaderboardEntry[];
 };
 
 export const addLeaderboardEntry = async (entry: LeaderboardInsert): Promise<void> => {

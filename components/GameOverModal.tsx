@@ -8,10 +8,9 @@ interface GameOverModalProps {
   disqualified: boolean;
   timedOut: boolean;
   onSubmitName: (name: string) => void;
-  onPlayAgain: () => void;
 }
 
-const GameOverModal: React.FC<GameOverModalProps> = ({ finalWinnings, isWinner, walkAway, disqualified, timedOut, onSubmitName, onPlayAgain }) => {
+const GameOverModal: React.FC<GameOverModalProps> = ({ finalWinnings, isWinner, walkAway, disqualified, timedOut, onSubmitName }) => {
     const [name, setName] = useState('');
 
     const formattedWinnings = finalWinnings.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 });
@@ -53,26 +52,20 @@ const GameOverModal: React.FC<GameOverModalProps> = ({ finalWinnings, isWinner, 
         </p>
 
         <div className="mt-8">
-            {isWinner ? (
-                <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4">
-                    <p className="text-sm font-semibold">Anda layak masuk papan peringkat! Masukkan nama Anda:</p>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Pemain Jenius"
-                        maxLength={20}
-                        className="px-4 py-2 w-full max-w-xs rounded-lg bg-white/10 border border-white/20 text-white text-center focus:ring-2 focus:ring-yellow-400 focus:outline-none"
-                    />
-                    <button type="submit" className="px-6 py-3 rounded-lg bg-yellow-600 hover:bg-yellow-500 text-black font-bold transition-transform transform hover:scale-105 w-full max-w-xs">
-                        Kirim & Lihat Papan Peringkat
-                    </button>
-                </form>
-            ) : (
-                <button onClick={onPlayAgain} className="px-6 py-3 rounded-lg bg-green-600 hover:bg-green-500 text-white font-bold transition-transform transform hover:scale-105 w-full max-w-xs">
-                    Main Lagi
+            <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4">
+                <p className="text-sm font-semibold">Catat skormu di papan peringkat! Masukkan nama Anda:</p>
+                <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Pemain Jenius"
+                    maxLength={20}
+                    className="px-4 py-2 w-full max-w-xs rounded-lg bg-white/10 border border-white/20 text-white text-center focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+                />
+                <button type="submit" className="px-6 py-3 rounded-lg bg-yellow-600 hover:bg-yellow-500 text-black font-bold transition-transform transform hover:scale-105 w-full max-w-xs">
+                    Kirim & Main Lagi
                 </button>
-            )}
+            </form>
         </div>
       </motion.div>
     </div>

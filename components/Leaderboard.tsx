@@ -26,7 +26,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, title }) => {
           {title}
         </h2>
         <p className="text-center text-xs text-indigo-400">Direset setiap minggu</p>
-        <p className="text-center text-xs text-gray-400 mb-4">Hanya juara yang ditampilkan, diurutkan berdasarkan waktu tercepat.</p>
+        <p className="text-center text-xs text-gray-400 mb-4">Peringkat berdasarkan hadiah tertinggi & waktu tercepat.</p>
         <div className="flex flex-col gap-3 overflow-y-auto pr-2">
           {leaderboard.length > 0 ? (
             leaderboard.map((player, index) => (
