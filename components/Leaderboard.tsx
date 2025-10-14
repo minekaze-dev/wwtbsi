@@ -13,6 +13,20 @@ const formatTime = (timeInSeconds: number) => {
     return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
 
+const formatPrizeAbbreviated = (prize: number): string => {
+  if (prize >= 1000000000) {
+    return `Rp ${prize / 1000000000} M`; // M for Miliar (Billion)
+  }
+  if (prize >= 1000000) {
+    return `Rp ${prize / 1000000} Jt`; // Jt for Juta (Million)
+  }
+  if (prize >= 1000) {
+    return `Rp ${prize / 1000}K`; // K for Kilo (Thousand)
+  }
+  return `Rp ${prize}`;
+};
+
+
 const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, title }) => {
   return (
     <motion.div
@@ -27,7 +41,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, title }) => {
         </h2>
         <p className="text-center text-xs text-indigo-400">Direset setiap minggu</p>
         <p className="text-center text-xs text-gray-400 mb-4">Peringkat berdasarkan hadiah tertinggi & waktu tercepat.</p>
-        <div className="flex flex-col gap-3 overflow-y-auto pr-2">
+        <div className="flex flex-col gap-2 overflow-y-auto pr-2">
           {leaderboard.length > 0 ? (
             leaderboard.map((player, index) => (
               <motion.div
@@ -35,13 +49,12 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, title }) => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, delay: 0.1 * index }}
-                className="bg-white/5 p-3 rounded-lg border border-white/10 flex items-center gap-3"
+                className="bg-white/5 px-3 py-2 rounded-lg border border-white/10 flex items-center gap-2"
               >
-                <div className="text-xl sm:text-2xl">{player.avatar}</div>
                 <div className="flex-grow min-w-0">
                   <div className="font-semibold text-sm text-white truncate">{player.name}</div>
                   <div className="text-xs text-indigo-300 flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <span className="whitespace-nowrap">🏆 {player.score.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}</span>
+                    <span className="whitespace-nowrap">🏆 {formatPrizeAbbreviated(player.score)}</span>
                     <span className="whitespace-nowrap">⭐ {player.points.toLocaleString('id-ID')} Pts</span>
                     <span className="whitespace-nowrap">⏱️ {formatTime(player.time_seconds)}</span>
                   </div>

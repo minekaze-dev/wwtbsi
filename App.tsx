@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Question, GameState, Lifelines, LifelineResult, LeaderboardEntry, ChatMessage, GameMode } from './types';
@@ -15,6 +16,11 @@ import ModeSelectionModal from './components/ModeSelectionModal';
 import TimerProgressBar from './components/TimerProgressBar';
 import TermsModal from './components/TermsModal';
 
+interface FinalGameStats {
+    prize: number;
+    points: number;
+    time: number;
+}
 
 export default function App() {
     const [gameState, setGameState] = useState<GameState>('WELCOME');
@@ -41,6 +47,7 @@ export default function App() {
     const [showModeSelectionModal, setShowModeSelectionModal] = useState(false);
     const [showTermsModal, setShowTermsModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [finalGameStats, setFinalGameStats] = useState<FinalGameStats | null>(null);
     
     // Timer State
     const [timeLeft, setTimeLeft] = useState<number | null>(null);
@@ -49,7 +56,6 @@ export default function App() {
     const timerIntervalRef = useRef<number | null>(null);
     const lifelineIntervalRef = useRef<number | null>(null);
     const startTimeRef = useRef<number | null>(null);
-    const gameEndTimeRef = useRef<number | null>(null);
     const [chatInput, setChatInput] = useState('');
     
     const gameConfig = useMemo(() => GAME_MODES[gameMode], [gameMode]);
@@ -78,13 +84,35 @@ export default function App() {
     useEffect(() => {
         loadLeaderboards();
     }, [loadLeaderboards]);
+
+    const getFinalWinnings = useCallback(() => {
+        if (walkedAway || isWinner) return score;
+        let lastGuaranteedLevel = 0;
+        for (const level of gameConfig.guaranteedLevels) {
+            if (currentIdx >= (level-1)) {
+                lastGuaranteedLevel = level;
+            } else {
+                break;
+            }
+        }
+        return lastGuaranteedLevel > 0 ? gameConfig.prizeTiers[lastGuaranteedLevel - 1].prize : 0;
+    }, [currentIdx, score, isWinner, walkedAway, gameConfig]);
     
     const endGame = useCallback(() => {
         clearTimer(timerIntervalRef);
         clearTimer(lifelineIntervalRef);
-        gameEndTimeRef.current = Date.now();
+        
+        const prize = getFinalWinnings();
+        const duration = startTimeRef.current ? (Date.now() - startTimeRef.current) / 1000 : 0;
+
+        setFinalGameStats({
+            prize: prize,
+            points: points,
+            time: duration,
+        });
+        
         setGameState('GAME_OVER');
-    }, [clearTimer]);
+    }, [clearTimer, getFinalWinnings, points]);
 
     useEffect(() => {
         const handleVisibilityChange = () => {
@@ -171,7 +199,7 @@ export default function App() {
         clearTimer(timerIntervalRef);
         setChatInput('');
         startTimeRef.current = null;
-        gameEndTimeRef.current = null;
+        setFinalGameStats(null);
         if(fullReset) {
             setLifelines({ fifty: false, audience: false, chat: false });
         }
@@ -335,15 +363,13 @@ export default function App() {
     };
 
     const handleNameSubmit = async (name: string) => {
-        if (!startTimeRef.current || !gameEndTimeRef.current) return;
-
-        const durationInSeconds = (gameEndTimeRef.current - startTimeRef.current) / 1000;
+        if (!finalGameStats) return;
 
         const newEntry: Omit<LeaderboardEntry, 'id' | 'created_at'> = {
             name,
-            score: getFinalWinnings(),
-            points: points,
-            time_seconds: durationInSeconds,
+            score: finalGameStats.prize,
+            points: finalGameStats.points,
+            time_seconds: finalGameStats.time,
             avatar: AVATARS[Math.floor(Math.random() * AVATARS.length)],
             game_mode: gameMode,
         };
@@ -359,19 +385,6 @@ export default function App() {
         setQuestions([]);
         resetGame(true);
     };
-
-    const getFinalWinnings = useCallback(() => {
-        if (walkedAway || isWinner) return score;
-        let lastGuaranteedLevel = 0;
-        for (const level of gameConfig.guaranteedLevels) {
-            if (currentIdx >= (level-1)) {
-                lastGuaranteedLevel = level;
-            } else {
-                break;
-            }
-        }
-        return lastGuaranteedLevel > 0 ? gameConfig.prizeTiers[lastGuaranteedLevel - 1].prize : 0;
-    }, [currentIdx, score, isWinner, walkedAway, gameConfig]);
     
     const currentQ = useMemo(() => questions[currentIdx], [questions, currentIdx]);
 
@@ -478,7 +491,7 @@ export default function App() {
                 <header className="flex items-center justify-between mb-6 flex-shrink-0 w-full max-w-7xl mx-auto">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-pink-500 to-yellow-400 flex items-center justify-center text-black font-bold text-2xl shadow-lg">
-                            <i className="fa-solid fa-brain"></i>
+                            <i className="fa-solid fa-trophy"></i>
                         </div>
                         <div>
                             <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">Who Wants to Be a Smartest Indonesian</h1>
@@ -509,9 +522,9 @@ export default function App() {
             </div>
             
             <AnimatePresence>
-                {gameState === 'GAME_OVER' && (
+                {gameState === 'GAME_OVER' && finalGameStats && (
                     <GameOverModal 
-                        finalWinnings={getFinalWinnings()}
+                        finalStats={finalGameStats}
                         walkAway={walkedAway}
                         isWinner={isWinner}
                         disqualified={disqualified}

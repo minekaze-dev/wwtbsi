@@ -22,6 +22,7 @@ const TermsModal: React.FC<TermsModalProps> = ({ onClose }) => {
             <ul className="list-disc list-inside space-y-1 pl-4">
                 <li>Layanan ini disediakan untuk tujuan hiburan dan pendidikan.</li>
                 <li>Pemain harus mematuhi semua aturan yang dijelaskan dalam "Tata Cara Bermain", termasuk larangan berbuat curang dalam bentuk apapun.</li>
+                <li><strong>Hadiah Virtual:</strong> Hadiah uang yang ditampilkan dalam permainan adalah sepenuhnya virtual dan hanya dimaksudkan untuk tujuan hiburan. Tidak ada uang nyata yang diberikan, dan tidak ada transaksi keuangan nyata yang terlibat dalam Layanan ini.</li>
                 <li>Kami berhak untuk mendiskualifikasi pemain atau mereset papan peringkat jika ditemukan adanya kecurangan atau pelanggaran.</li>
             </ul>
 
