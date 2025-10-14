@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Question, GameState, Lifelines, LifelineResult, LeaderboardEntry, ChatMessage, GameMode } from './types';
@@ -16,6 +14,7 @@ import EtiquetteModal from './components/EtiquetteModal';
 import ModeSelectionModal from './components/ModeSelectionModal';
 import TimerProgressBar from './components/TimerProgressBar';
 import TermsModal from './components/TermsModal';
+import AboutModal from './components/AboutModal';
 
 interface FinalGameStats {
     prize: number;
@@ -47,6 +46,7 @@ export default function App() {
     const [showEtiquetteModal, setShowEtiquetteModal] = useState(false);
     const [showModeSelectionModal, setShowModeSelectionModal] = useState(false);
     const [showTermsModal, setShowTermsModal] = useState(false);
+    const [showAboutModal, setShowAboutModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [finalGameStats, setFinalGameStats] = useState<FinalGameStats | null>(null);
     
@@ -87,7 +87,9 @@ export default function App() {
     }, [loadLeaderboards]);
 
     const getFinalWinnings = useCallback(() => {
-        if (walkedAway || isWinner) return score;
+        if (isWinner) return gameConfig.prizeTiers[gameConfig.prizeTiers.length - 1].prize;
+        if (walkedAway) return score;
+
         let lastGuaranteedLevel = 0;
         for (const level of gameConfig.guaranteedLevels) {
             if (currentIdx >= (level-1)) {
@@ -519,6 +521,9 @@ export default function App() {
                     <button onClick={() => setShowTermsModal(true)} className="hover:text-white transition-colors underline">
                         Syarat & Ketentuan
                     </button>
+                     <button onClick={() => setShowAboutModal(true)} className="hover:text-white transition-colors underline">
+                        Tentang
+                    </button>
                 </footer>
             </div>
             
@@ -559,6 +564,11 @@ export default function App() {
              <AnimatePresence>
                 {showTermsModal && (
                     <TermsModal onClose={() => setShowTermsModal(false)} />
+                )}
+            </AnimatePresence>
+             <AnimatePresence>
+                {showAboutModal && (
+                    <AboutModal onClose={() => setShowAboutModal(false)} />
                 )}
             </AnimatePresence>
         </div>

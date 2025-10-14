@@ -12,12 +12,12 @@ const EtiquetteModal: React.FC<EtiquetteModalProps> = ({ onClose }) => {
         initial={{ opacity: 0, scale: 0.8, y: 50 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-        className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-8 max-w-lg w-full text-center shadow-2xl border border-white/10"
+        className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-6 sm:p-8 max-w-lg w-full text-center shadow-2xl border border-white/10 flex flex-col max-h-[90vh]"
       >
-        <h3 className="text-2xl font-bold text-yellow-400">Tata Cara Bermain</h3>
-        <div className="mt-4 text-left text-gray-300 space-y-3">
-            <p>Selamat datang di Who Wants to Be a Smartest Indonesian! Demi menjaga keseruan dan integritas permainan, harap patuhi beberapa aturan sederhana:</p>
-            <ul className="list-disc list-inside space-y-2 pl-4">
+        <h3 className="text-xl sm:text-2xl font-bold text-yellow-400 flex-shrink-0">Tata Cara Bermain</h3>
+        <div className="mt-3 sm:mt-4 text-left text-gray-300 space-y-2 sm:space-y-3 overflow-y-auto pr-2 flex-grow">
+            <p className="text-sm sm:text-base">Selamat datang di Who Wants to Be a Smartest Indonesian! Demi menjaga keseruan dan integritas permainan, harap patuhi beberapa aturan sederhana:</p>
+            <ul className="list-disc list-inside space-y-2 text-sm sm:text-base pl-4">
                 <li>
                     <strong>Jawab dengan Jujur:</strong> Andalkan pengetahuan Anda sendiri untuk menjawab setiap pertanyaan.
                 </li>
@@ -34,9 +34,9 @@ const EtiquetteModal: React.FC<EtiquetteModalProps> = ({ onClose }) => {
                     <strong>Tetap Fokus pada Permainan:</strong> Meninggalkan tab browser atau beralih ke aplikasi lain selama kuis akan mengakibatkan diskualifikasi otomatis.
                 </li>
             </ul>
-            <p className="text-center font-semibold pt-2">Mari bermain dengan adil dan buktikan bahwa Anda adalah yang terpintar!</p>
+            <p className="text-center font-semibold pt-2 text-sm sm:text-base">Mari bermain dengan adil dan buktikan bahwa Anda adalah yang terpintar!</p>
         </div>
-        <div className="mt-8 flex justify-center">
+        <div className="mt-6 sm:mt-8 flex justify-center flex-shrink-0">
           <button
             onClick={onClose}
             className="px-6 py-3 rounded-lg bg-green-600 hover:bg-green-500 text-white font-bold transition-transform transform hover:scale-105"
