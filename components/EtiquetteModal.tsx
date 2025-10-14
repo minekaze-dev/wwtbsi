@@ -16,7 +16,7 @@ const EtiquetteModal: React.FC<EtiquetteModalProps> = ({ onClose }) => {
       >
         <h3 className="text-2xl font-bold text-yellow-400">Tata Cara Bermain</h3>
         <div className="mt-4 text-left text-gray-300 space-y-3">
-            <p>Selamat datang di Who Wants to Be a Smart Indonesian! Demi menjaga keseruan dan integritas permainan, harap patuhi beberapa aturan sederhana:</p>
+            <p>Selamat datang di Who Wants to Be a Smartest Indonesian! Demi menjaga keseruan dan integritas permainan, harap patuhi beberapa aturan sederhana:</p>
             <ul className="list-disc list-inside space-y-2 pl-4">
                 <li>
                     <strong>Jawab dengan Jujur:</strong> Andalkan pengetahuan Anda sendiri untuk menjawab setiap pertanyaan.

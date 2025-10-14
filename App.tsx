@@ -13,6 +13,7 @@ import ConfirmationModal from './components/ConfirmationModal';
 import EtiquetteModal from './components/EtiquetteModal';
 import ModeSelectionModal from './components/ModeSelectionModal';
 import TimerProgressBar from './components/TimerProgressBar';
+import TermsModal from './components/TermsModal';
 
 
 export default function App() {
@@ -38,6 +39,8 @@ export default function App() {
     const [isConfirmingWalkAway, setIsConfirmingWalkAway] = useState(false);
     const [showEtiquetteModal, setShowEtiquetteModal] = useState(false);
     const [showModeSelectionModal, setShowModeSelectionModal] = useState(false);
+    const [showTermsModal, setShowTermsModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     
     // Timer State
     const [timeLeft, setTimeLeft] = useState<number | null>(null);
@@ -188,6 +191,11 @@ export default function App() {
             setGameState('PLAYING');
         } catch (error) {
             console.error(error);
+            if (error instanceof Error) {
+                setErrorMessage(error.message);
+            } else {
+                setErrorMessage("Terjadi kesalahan yang tidak diketahui.");
+            }
             setGameState('ERROR');
         }
     };
@@ -375,9 +383,11 @@ export default function App() {
                 return (
                     <div className="flex-grow flex items-center justify-center text-center text-white">
                         <div>
-                            <h2 className="text-2xl text-red-500">Failed to Load Quiz</h2>
-                            <p className="mt-2">There was an error communicating with the AI. Please try again.</p>
-                            <button onClick={() => setGameState('WELCOME')} className="mt-4 px-4 py-2 bg-indigo-600 rounded">Back to Menu</button>
+                            <h2 className="text-2xl font-bold text-red-500">Terjadi Kesalahan</h2>
+                            <p className="mt-2 max-w-md">{errorMessage || "Gagal memuat kuis. Silakan coba lagi."}</p>
+                            <button onClick={() => { setGameState('WELCOME'); setErrorMessage(null); }} className="mt-4 px-4 py-2 bg-indigo-600 rounded">
+                                Kembali ke Menu
+                            </button>
                         </div>
                     </div>
                 );
@@ -490,8 +500,11 @@ export default function App() {
                     </motion.div>
                 </AnimatePresence>
 
-                <footer className="text-center text-xs text-gray-500 pt-4 flex-shrink-0">
-                    © 2025 Who Wants to Be a Smartest Indonesian. All Rights Reserved.
+                <footer className="text-center text-xs text-gray-500 pt-4 flex-shrink-0 flex items-center justify-center gap-4">
+                    <span>© 2025 Who Wants to Be a Smartest Indonesian. All Rights Reserved.</span>
+                    <button onClick={() => setShowTermsModal(true)} className="hover:text-white transition-colors underline">
+                        Syarat & Ketentuan
+                    </button>
                 </footer>
             </div>
             
@@ -525,6 +538,11 @@ export default function App() {
             <AnimatePresence>
                 {showEtiquetteModal && (
                     <EtiquetteModal onClose={handleAcknowledgeEtiquette} />
+                )}
+            </AnimatePresence>
+             <AnimatePresence>
+                {showTermsModal && (
+                    <TermsModal onClose={() => setShowTermsModal(false)} />
                 )}
             </AnimatePresence>
         </div>

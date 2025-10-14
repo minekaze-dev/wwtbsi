@@ -39,8 +39,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentQuestionIndex, prizeTiers, gua
   
   const handleShare = async () => {
     const shareData = {
-        title: 'Who Wants to Be a Smart Indonesian',
-        text: 'Saya menantangmu di kuis Who Wants to Be a Smart Indonesian! Bisakah kamu mengalahkan skorku?',
+        title: 'Who Wants to Be a Smartest Indonesian',
+        text: 'Saya menantangmu di kuis Who Wants to Be a Smartest Indonesian! Bisakah kamu mengalahkan skorku?',
         url: window.location.href,
     };
 

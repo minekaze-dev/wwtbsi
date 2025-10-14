@@ -79,7 +79,10 @@ Untuk setiap pertanyaan, berikan empat pilihan ganda dengan hanya satu jawaban y
     }
   } catch (error) {
     console.error("Error generating questions:", error);
-    throw new Error("Failed to generate questions. Please try again.");
+    if (error instanceof Error && /rate limit|quota/i.test(error.message)) {
+        throw new Error("Maaf, kuota pertanyaan untuk hari ini telah habis. Silakan kembali lagi besok, kuis saat ini ditutup.");
+    }
+    throw new Error("Gagal membuat pertanyaan. Silakan coba lagi.");
   }
 };
 
