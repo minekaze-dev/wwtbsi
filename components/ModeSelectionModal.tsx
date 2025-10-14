@@ -4,6 +4,7 @@ import { GameMode } from '../types';
 
 interface ModeSelectionModalProps {
   onSelectMode: (mode: GameMode) => void;
+  onClose: () => void;
 }
 
 const ModeCard: React.FC<{
@@ -28,15 +29,23 @@ const ModeCard: React.FC<{
   );
 };
 
-const ModeSelectionModal: React.FC<ModeSelectionModalProps> = ({ onSelectMode }) => {
+const ModeSelectionModal: React.FC<ModeSelectionModalProps> = ({ onSelectMode, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.8, y: 50 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-        className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-8 max-w-2xl w-full text-center shadow-2xl border border-white/10"
+        className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-8 max-w-2xl w-full text-center shadow-2xl border border-white/10 relative"
       >
+        <button 
+          onClick={onClose} 
+          className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors z-10"
+          aria-label="Tutup"
+        >
+          <i className="fa-solid fa-times text-2xl"></i>
+        </button>
+
         <h3 className="text-3xl font-extrabold text-white">Pilih Mode Permainan</h3>
         <p className="mt-2 text-gray-400">Pilih tingkat kesulitan tantangan Anda.</p>
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -50,7 +59,7 @@ const ModeSelectionModal: React.FC<ModeSelectionModalProps> = ({ onSelectMode })
           />
           <ModeCard
             mode="HARD"
-            title="Sulit"
+            title="Hard"
             description="Tantangan 50 pertanyaan klasik dengan tingkat kesulitan yang terus meningkat tajam. Hanya untuk yang paling berani."
             prize="Rp 1 Miliar"
             onSelect={() => onSelectMode('HARD')}

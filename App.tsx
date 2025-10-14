@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Question, GameState, Lifelines, LifelineResult, LeaderboardEntry, ChatMessage, GameMode } from './types';
@@ -544,7 +545,10 @@ export default function App() {
             </AnimatePresence>
             <AnimatePresence>
                 {showModeSelectionModal && (
-                    <ModeSelectionModal onSelectMode={handleModeSelect} />
+                    <ModeSelectionModal 
+                        onSelectMode={handleModeSelect} 
+                        onClose={() => setShowModeSelectionModal(false)}
+                    />
                 )}
             </AnimatePresence>
             <AnimatePresence>
