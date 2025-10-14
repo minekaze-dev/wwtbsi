@@ -430,7 +430,7 @@ export default function App() {
                                             Pilih mode permainan Anda dan buktikan pengetahuan Anda untuk menjadi yang terpintar di Indonesia!
                                         </p>
                                         <button onClick={handleStartQuizFlow} className="mt-8 px-8 py-4 bg-green-600 hover:bg-green-500 rounded-lg transition-colors font-bold text-xl transform hover:scale-105">
-                                            Mulai Kuis!
+                                            Start Quiz!
                                         </button>
                                     </motion.div>
                                 ) : (
@@ -498,7 +498,7 @@ export default function App() {
                         </div>
                         <div>
                             <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">Who Wants to Be a Smartest Indonesian</h1>
-                            <p className="text-xs sm:text-sm text-gray-300 font-semibold bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent">Be #1 in Indonesia</p>
+                            <p className="text-xs sm:text-sm text-gray-300 font-semibold bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent">Be #1 in Indonesia | Smart quiz berbasis AI</p>
                         </div>
                     </div>
                 </header>
