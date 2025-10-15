@@ -514,13 +514,13 @@ export default function App() {
                 {renderContent()}
             </div>
             
-            <footer className="w-full text-center pt-4 flex-shrink-0 text-gray-500 text-xs z-10">
-                <div className="flex justify-center items-center gap-4 mb-2">
+            <footer className="w-full max-w-7xl mx-auto pt-4 flex-shrink-0 text-gray-500 text-xs z-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 text-center sm:text-left">
+                <p>&copy; {new Date().getFullYear()} Who Wants to Be a Smartest Indonesian. All Rights Reserved.</p>
+                <div className="flex items-center justify-center sm:justify-end gap-4">
                     <button onClick={() => setShowTermsModal(true)} className="hover:text-white transition-colors">Syarat & Ketentuan</button>
                     <span className="opacity-50">|</span>
                     <button onClick={() => setShowAboutModal(true)} className="hover:text-white transition-colors">Tentang Aplikasi</button>
                 </div>
-                <p>&copy; {new Date().getFullYear()} Who Wants to Be a Smartest Indonesian. All Rights Reserved.</p>
             </footer>
 
             <AnimatePresence>
