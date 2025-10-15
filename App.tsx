@@ -15,6 +15,7 @@ import ModeSelectionModal from './components/ModeSelectionModal';
 import TimerProgressBar from './components/TimerProgressBar';
 import TermsModal from './components/TermsModal';
 import AboutModal from './components/AboutModal';
+import MobileMenu from './components/MobileMenu';
 
 interface FinalGameStats {
     prize: number;
@@ -49,6 +50,7 @@ export default function App() {
     const [showAboutModal, setShowAboutModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [finalGameStats, setFinalGameStats] = useState<FinalGameStats | null>(null);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     
     // Timer State
     const [timeLeft, setTimeLeft] = useState<number | null>(null);
@@ -493,84 +495,57 @@ export default function App() {
             <div className="z-10 flex flex-col h-full flex-grow">
                 <header className="flex items-center justify-between mb-6 flex-shrink-0 w-full max-w-7xl mx-auto">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-pink-500 to-yellow-400 flex items-center justify-center text-black font-bold text-2xl shadow-lg">
-                            <i className="fa-solid fa-trophy"></i>
+                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-pink-500 to-yellow-400 flex items-center justify-center text-white">
+                            <i className="fa-solid fa-brain text-2xl"></i>
                         </div>
-                        <div>
-                            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">Who Wants to Be a Smartest Indonesian</h1>
-                            <p className="text-xs sm:text-sm text-gray-300 font-semibold bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent">Be #1 in Indonesia | Smart quiz berbasis AI</p>
-                        </div>
+                        <h1 className="text-lg sm:text-xl font-bold tracking-tighter">Who Wants to Be a Smartest Indonesian</h1>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <button onClick={() => setShowAboutModal(true)} className="hidden sm:inline text-sm text-gray-400 hover:text-white transition-colors">Tentang</button>
+                        <button onClick={() => setShowTermsModal(true)} className="hidden sm:inline text-sm text-gray-400 hover:text-white transition-colors">S&K</button>
+                        <button 
+                            onClick={() => setIsMobileMenuOpen(true)}
+                            className="lg:hidden p-2 text-xl text-gray-300 hover:text-white transition-colors"
+                            aria-label="Buka menu"
+                        >
+                            <i className="fa-solid fa-bars"></i>
+                        </button>
                     </div>
                 </header>
 
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={gameState}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.5 }}
-                        className="flex-grow flex flex-col"
-                    >
-                        {renderContent()}
-                    </motion.div>
-                </AnimatePresence>
-
-                <footer className="text-center text-xs text-gray-500 pt-4 flex-shrink-0 flex items-center justify-center gap-4">
-                    <span>© 2025 Who Wants to Be a Smartest Indonesian. All Rights Reserved.</span>
-                    <button onClick={() => setShowTermsModal(true)} className="hover:text-white transition-colors underline">
-                        Syarat & Ketentuan
-                    </button>
-                     <button onClick={() => setShowAboutModal(true)} className="hover:text-white transition-colors underline">
-                        Tentang
-                    </button>
-                </footer>
+                {renderContent()}
             </div>
             
             <AnimatePresence>
                 {gameState === 'GAME_OVER' && finalGameStats && (
                     <GameOverModal 
                         finalStats={finalGameStats}
-                        walkAway={walkedAway}
                         isWinner={isWinner}
+                        walkAway={walkedAway}
                         disqualified={disqualified}
                         timedOut={timedOut}
                         onSubmitName={handleNameSubmit}
                     />
                 )}
-            </AnimatePresence>
-            <AnimatePresence>
-                {isConfirmingWalkAway && (
+                 {isConfirmingWalkAway && (
                     <ConfirmationModal 
-                        prizeAmount={score}
+                        prizeAmount={score} 
                         onConfirm={handleConfirmWalkAway}
                         onCancel={handleCancelWalkAway}
                     />
                 )}
+                {showEtiquetteModal && <EtiquetteModal onClose={handleAcknowledgeEtiquette} />}
+                {showModeSelectionModal && <ModeSelectionModal onSelectMode={handleModeSelect} onClose={() => setShowModeSelectionModal(false)} />}
+                {showTermsModal && <TermsModal onClose={() => setShowTermsModal(false)} />}
+                {showAboutModal && <AboutModal onClose={() => setShowAboutModal(false)} />}
             </AnimatePresence>
-            <AnimatePresence>
-                {showModeSelectionModal && (
-                    <ModeSelectionModal 
-                        onSelectMode={handleModeSelect} 
-                        onClose={() => setShowModeSelectionModal(false)}
-                    />
-                )}
-            </AnimatePresence>
-            <AnimatePresence>
-                {showEtiquetteModal && (
-                    <EtiquetteModal onClose={handleAcknowledgeEtiquette} />
-                )}
-            </AnimatePresence>
-             <AnimatePresence>
-                {showTermsModal && (
-                    <TermsModal onClose={() => setShowTermsModal(false)} />
-                )}
-            </AnimatePresence>
-             <AnimatePresence>
-                {showAboutModal && (
-                    <AboutModal onClose={() => setShowAboutModal(false)} />
-                )}
-            </AnimatePresence>
+
+            <MobileMenu 
+                isOpen={isMobileMenuOpen} 
+                onClose={() => setIsMobileMenuOpen(false)}
+                hardLeaderboard={hardLeaderboard}
+                normalLeaderboard={normalLeaderboard}
+            />
         </div>
     );
 }
