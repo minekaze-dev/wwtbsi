@@ -496,13 +496,11 @@ export default function App() {
                 <header className="flex items-center justify-between mb-6 flex-shrink-0 w-full max-w-7xl mx-auto">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-pink-500 to-yellow-400 flex items-center justify-center text-white">
-                            <i className="fa-solid fa-brain text-2xl"></i>
+                            <i className="fa-solid fa-trophy text-2xl"></i>
                         </div>
                         <h1 className="text-lg sm:text-xl font-bold tracking-tighter">Who Wants to Be a Smartest Indonesian</h1>
                     </div>
                     <div className="flex items-center gap-4">
-                        <button onClick={() => setShowAboutModal(true)} className="hidden sm:inline text-sm text-gray-400 hover:text-white transition-colors">Tentang</button>
-                        <button onClick={() => setShowTermsModal(true)} className="hidden sm:inline text-sm text-gray-400 hover:text-white transition-colors">S&K</button>
                         <button 
                             onClick={() => setIsMobileMenuOpen(true)}
                             className="lg:hidden p-2 text-xl text-gray-300 hover:text-white transition-colors"
@@ -516,6 +514,15 @@ export default function App() {
                 {renderContent()}
             </div>
             
+            <footer className="w-full text-center pt-4 flex-shrink-0 text-gray-500 text-xs z-10">
+                <div className="flex justify-center items-center gap-4 mb-2">
+                    <button onClick={() => setShowTermsModal(true)} className="hover:text-white transition-colors">Syarat & Ketentuan</button>
+                    <span className="opacity-50">|</span>
+                    <button onClick={() => setShowAboutModal(true)} className="hover:text-white transition-colors">Tentang Aplikasi</button>
+                </div>
+                <p>&copy; {new Date().getFullYear()} Who Wants to Be a Smartest Indonesian. All Rights Reserved.</p>
+            </footer>
+
             <AnimatePresence>
                 {gameState === 'GAME_OVER' && finalGameStats && (
                     <GameOverModal 
